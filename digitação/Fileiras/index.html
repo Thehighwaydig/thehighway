@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE Highway - Treino de Digitação</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="assets/logo.png" alt="THE Highway Logo" class="logo">
+                    <div class="logo-text">
+                        <h1 class="site-title">THE Highway</h1>
+                        <p class="site-subtitle">Treino de Digitação</p>
+                    </div>
+                </div>
+                <button class="theme-toggle" id="themeToggle" title="Alternar tema">
+                    <span class="theme-icon">🌙</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h2>Bem-vindo ao <span class="highlight">THE Highway</span></h2>
+            <p>Treine cada fileira do teclado separadamente para desenvolver memória muscular e aumentar sua velocidade de digitação com precisão profissional.</p>
+        </section>
+
+        <!-- Tab Navigation -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="home">Fileira Central</button>
+            <button class="tab-btn" data-tab="top">Fileira Superior</button>
+            <button class="tab-btn" data-tab="bottom">Fileira Inferior</button>
+        </div>
+
+        <!-- Tab Description -->
+        <div class="tab-description" id="tabDescription">
+            Domine a fileira central - a base de toda digitação rápida
+        </div>
+
+        <!-- Training Mode Selector -->
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="chars">Caracteres</button>
+            <button class="mode-btn" data-mode="words">Palavras</button>
+            <button class="mode-btn" data-mode="timed">Cronometrado</button>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+            <!-- Training Section -->
+            <div class="training-section">
+                <!-- Difficulty Selector -->
+                <div class="difficulty-selector">
+                    <button class="difficulty-btn active" data-difficulty="easy">Fácil</button>
+                    <button class="difficulty-btn" data-difficulty="medium">Médio</button>
+                    <button class="difficulty-btn" data-difficulty="hard">Difícil</button>
+                </div>
+
+                <!-- Training Text Display -->
+                <div class="training-card">
+                    <div class="training-text" id="trainingText">Clique para começar...</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <input 
+                        type="text" 
+                        class="training-input" 
+                        id="trainingInput" 
+                        placeholder="Clique aqui e comece a digitar..."
+                        autocomplete="off"
+                    >
+                </div>
+
+                <!-- Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">WPM</div>
+                        <div class="stat-value" id="wpmValue">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Precisão</div>
+                        <div class="stat-value" id="accuracyValue">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Erros</div>
+                        <div class="stat-value" id="errorsValue">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Tempo</div>
+                        <div class="stat-value" id="timeValue">0s</div>
+                    </div>
+                </div>
+
+                <!-- Control Buttons -->
+                <div class="control-buttons">
+                    <button class="btn btn-primary" id="startBtn">Começar</button>
+                    <button class="btn btn-secondary" id="pauseBtn" disabled>Pausar</button>
+                    <button class="btn btn-secondary" id="resetBtn">Resetar</button>
+                    <button class="btn btn-icon" id="soundBtn" title="Alternar som">🔊</button>
+                </div>
+            </div>
+
+            <!-- Virtual Keyboard Section -->
+            <div class="keyboard-section">
+                <div class="keyboard-card">
+                    <h3 class="keyboard-title" id="keyboardTitle">Fileira Central (Home Row)</h3>
+                    <p class="keyboard-description">Posição de repouso - mantenha seus dedos aqui</p>
+                    
+                    <div class="virtual-keyboard" id="virtualKeyboard"></div>
+                    
+                    <!-- Finger Guide -->
+                    <div class="finger-guide">
+                        <h4>Guia de Dedos</h4>
+                        <div class="finger-colors">
+                            <div class="finger-item">
+                                <div class="finger-color" style="background-color: #ef4444;"></div>
+                                <span>Mínimo</span>
+                            </div>
+                            <div class="finger-item">
+                                <div class="finger-color" style="background-color: #f97316;"></div>
+                                <span>Anular</span>
+                            </div>
+                            <div class="finger-item">
+                                <div class="finger-color" style="background-color: #eab308;"></div>
+                                <span>Médio</span>
+                            </div>
+                            <div class="finger-item">
+                                <div class="finger-color" style="background-color: #06b6d4;"></div>
+                                <span>Indicador</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Character Indicator -->
+                    <div class="current-char" id="currentCharIndicator" style="display: none;">
+                        <p>Próxima Tecla</p>
+                        <div class="char-display" id="charDisplay">A</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <section class="progress-section">
+            <div class="tabs-progress">
+                <button class="progress-tab-btn active" data-progress-tab="stats">Seu Progresso</button>
+                <button class="progress-tab-btn" data-progress-tab="tips">Dicas & Guia</button>
+            </div>
+
+            <!-- Progress Tab Content -->
+            <div class="progress-content active" id="statsTab">
+                <!-- Main Stats -->
+                <div class="main-stats">
+                    <div class="stat-box">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Sessões</div>
+                            <div class="stat-number" id="totalSessions">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">⚡</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Melhor WPM</div>
+                            <div class="stat-number" id="bestWPM">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Precisão Média</div>
+                            <div class="stat-number" id="avgAccuracy">0%</div>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon">🔥</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Sequência</div>
+                            <div class="stat-number" id="streak">0d</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Bars -->
+                <div class="progress-bars">
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>WPM (Meta: 100)</span>
+                            <span class="progress-percent" id="wpmPercent">0%</span>
+                        </div>
+                        <div class="progress-bar-large">
+                            <div class="progress-fill-large" id="wpmBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>Precisão (Meta: 99%)</span>
+                            <span class="progress-percent" id="accuracyPercent">0%</span>
+                        </div>
+                        <div class="progress-bar-large">
+                            <div class="progress-fill-large" id="accuracyBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>Sessões (Meta: 100)</span>
+                            <span class="progress-percent" id="sessionsPercent">0%</span>
+                        </div>
+                        <div class="progress-bar-large">
+                            <div class="progress-fill-large" id="sessionsBar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="achievements">
+                    <h3>Conquistas</h3>
+                    <div class="achievements-grid" id="achievementsGrid"></div>
+                </div>
+            </div>
+
+            <!-- Tips Tab Content -->
+            <div class="progress-content" id="tipsTab">
+                <div class="tips-container">
+                    <div class="tips-card">
+                        <h3>💡 Dicas para Melhorar</h3>
+                        <ul class="tips-list">
+                            <li><strong>1. Comece com dificuldade fácil</strong> e aumente gradualmente conforme sua velocidade melhora</li>
+                            <li><strong>2. Mantenha os dedos na posição correta</strong> (Home Row) - esta é a base de toda digitação rápida</li>
+                            <li><strong>3. Foque em precisão antes de velocidade</strong> - erros custam mais tempo do que digitar lentamente</li>
+                            <li><strong>4. Pratique regularmente</strong> (30 minutos por dia) para desenvolver memória muscular</li>
+                            <li><strong>5. Use o modo de palavras</strong> para treinar contexto real de digitação</li>
+                            <li><strong>6. Não olhe para o teclado</strong> - use o teclado virtual como guia</li>
+                        </ul>
+                    </div>
+
+                    <div class="tips-card">
+                        <h3>🎯 Metas de Digitação</h3>
+                        <div class="goals-list">
+                            <div class="goal-item">
+                                <span>Iniciante</span>
+                                <span class="goal-value">20-40 WPM</span>
+                            </div>
+                            <div class="goal-item">
+                                <span>Intermediário</span>
+                                <span class="goal-value">40-60 WPM</span>
+                            </div>
+                            <div class="goal-item">
+                                <span>Avançado</span>
+                                <span class="goal-value">60-100 WPM</span>
+                            </div>
+                            <div class="goal-item">
+                                <span>Profissional</span>
+                                <span class="goal-value">100+ WPM</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tips-card">
+                        <h3>📊 Entendendo as Métricas</h3>
+                        <div class="metrics-list">
+                            <div class="metric-item">
+                                <strong>WPM (Palavras por Minuto)</strong>
+                                <p>Velocidade de digitação. Uma palavra = 5 caracteres em média.</p>
+                            </div>
+                            <div class="metric-item">
+                                <strong>Precisão (%)</strong>
+                                <p>Porcentagem de caracteres digitados corretamente. Objetivo: 95%+</p>
+                            </div>
+                            <div class="metric-item">
+                                <strong>Erros</strong>
+                                <p>Número total de caracteres digitados incorretamente durante a sessão.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>THE Highway © 2026 - Treino de Digitação Premium</p>
+        <p>Desenvolvido para ajudar você a dominar o teclado</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

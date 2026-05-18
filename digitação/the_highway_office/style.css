@@ -1,0 +1,224 @@
+:root {
+    --primary: #8a2be2;
+    --secondary: #4b0082;
+    --bg: #0d0221;
+    --surface: #1a0b2e;
+    --text: #e0d7ff;
+    --accent: #00f2ff;
+    --success: #00ff88;
+    --danger: #ff0055;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.app-container {
+    width: 95vw;
+    height: 90vh;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--primary);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 30px rgba(138, 43, 226, 0.2);
+}
+
+header {
+    padding: 1rem 2rem;
+    background: rgba(0,0,0,0.3);
+    border-bottom: 1px solid var(--primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo h1 {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+}
+
+.logo span {
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.stats-bar {
+    display: flex;
+    gap: 2rem;
+}
+
+.stat {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--accent);
+}
+
+.stat span {
+    color: white;
+}
+
+main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 250px;
+    background: rgba(0,0,0,0.2);
+    border-right: 1px solid var(--primary);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.nav-btn {
+    padding: 1rem;
+    text-align: left;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.nav-btn:hover {
+    background: rgba(138, 43, 226, 0.1);
+}
+
+.nav-btn.active {
+    background: var(--primary);
+    color: white;
+}
+
+.content-area {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.module-header h2 {
+    color: var(--primary);
+    margin-bottom: 0.2rem;
+}
+
+.module-header p {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+.display-box {
+    background: #000;
+    padding: 1.5rem;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    min-height: 150px;
+    border-left: 4px solid var(--primary);
+    white-space: pre-wrap;
+}
+
+.char-correct { color: var(--success); }
+.char-incorrect { color: var(--danger); background: rgba(255,0,85,0.2); }
+.char-current { border-bottom: 2px solid var(--accent); }
+
+textarea {
+    width: 100%;
+    height: 150px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    color: white;
+    padding: 1rem;
+    font-size: 1.1rem;
+    resize: none;
+    outline: none;
+}
+
+textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.1);
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+}
+
+button#start-btn {
+    background: var(--success);
+    color: #003311;
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(5px);
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal-content {
+    background: var(--surface);
+    padding: 3rem;
+    border-radius: 15px;
+    border: 2px solid var(--primary);
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+}
+
+.report-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.report-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    border-bottom: 1px solid rgba(138, 43, 226, 0.3);
+}
+
+.report-item strong {
+    color: var(--accent);
+}
+
+.modal-content button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}

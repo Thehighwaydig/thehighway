@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Highway — Jogo de Digitação</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#0a0010;
+  --purple:#7c3aed;
+  --purple-light:#a855f7;
+  --purple-glow:#c084fc;
+  --orange:#ff6b00;
+  --orange-light:#ff9a3c;
+  --white:#f0e8ff;
+  --green:#00ff88;
+  --red:#ff2255;
+  --yellow:#ffe000;
+  --dim:rgba(124,58,237,0.12);
+}
+
+body{
+  background:var(--bg);
+  color:var(--white);
+  font-family:'Share Tech Mono',monospace;
+  min-height:100vh;
+  overflow:hidden;
+  cursor:crosshair;
+}
+
+/* Scanlines */
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);
+  pointer-events:none;
+  z-index:9999;
+}
+
+canvas#bg-canvas{
+  position:fixed;
+  inset:0;
+  z-index:0;
+}
+
+/* ===== SCREENS ===== */
+.screen{
+  position:fixed;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:10;
+  padding:2rem;
+  transition:opacity 0.4s;
+}
+.screen.hidden{opacity:0;pointer-events:none}
+
+/* ===== TITLE SCREEN ===== */
+#screen-title{text-align:center}
+
+.logo-wrap{margin-bottom:2rem}
+.logo-the{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3rem,7vw,5rem);
+  color:var(--white);
+  letter-spacing:0.08em;
+  display:block;
+  line-height:1;
+}
+.logo-highway{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(4.5rem,12vw,9rem);
+  color:var(--orange);
+  letter-spacing:0.05em;
+  display:block;
+  line-height:0.9;
+  text-shadow:0 0 40px rgba(255,107,0,0.6),0 0 80px rgba(255,107,0,0.3);
+  animation:pulseOrange 2s ease-in-out infinite;
+}
+@keyframes pulseOrange{
+  0%,100%{text-shadow:0 0 40px rgba(255,107,0,0.6),0 0 80px rgba(255,107,0,0.3)}
+  50%{text-shadow:0 0 60px rgba(255,107,0,0.9),0 0 120px rgba(255,107,0,0.5)}
+}
+
+.subtitle{
+  font-family:'Orbitron',monospace;
+  font-size:0.7rem;
+  letter-spacing:0.3em;
+  color:var(--purple-light);
+  margin-bottom:3rem;
+  text-transform:uppercase;
+}
+
+.start-btn{
+  font-family:'Orbitron',monospace;
+  font-size:1.1rem;
+  font-weight:700;
+  letter-spacing:0.2em;
+  padding:1rem 3rem;
+  background:transparent;
+  border:2px solid var(--orange);
+  color:var(--orange);
+  cursor:pointer;
+  text-transform:uppercase;
+  position:relative;
+  overflow:hidden;
+  transition:all 0.2s;
+  clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);
+}
+.start-btn::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:var(--orange);
+  transform:translateX(-100%);
+  transition:transform 0.25s;
+  z-index:-1;
+}
+.start-btn:hover{color:var(--bg);text-shadow:none}
+.start-btn:hover::before{transform:translateX(0)}
+
+.high-score-display{
+  margin-top:2rem;
+  font-size:0.75rem;
+  color:var(--purple-light);
+  letter-spacing:0.1em;
+}
+.high-score-display span{color:var(--yellow);font-size:1rem}
+
+/* ===== HUD ===== */
+#hud{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:20;
+  padding:1rem 2rem;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:linear-gradient(to bottom,rgba(10,0,16,0.95),transparent);
+  pointer-events:none;
+}
+#hud.hidden{display:none}
+
+.hud-left,.hud-right{display:flex;gap:1.5rem;align-items:center}
+.hud-center{text-align:center}
+
+.hud-stat{text-align:center}
+.hud-val{
+  font-family:'Orbitron',monospace;
+  font-size:1.4rem;
+  font-weight:900;
+  display:block;
+  line-height:1;
+}
+.hud-lbl{
+  font-size:0.55rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--purple-light);
+  opacity:0.7;
+}
+
+#hud-score .hud-val{color:var(--yellow)}
+#hud-phase .hud-val{color:var(--orange);font-size:1rem}
+#hud-lives .hud-val{color:var(--red);letter-spacing:0.1em}
+#hud-combo .hud-val{color:var(--green)}
+#hud-accuracy .hud-val{color:var(--purple-glow)}
+
+/* Phase name */
+.phase-name{
+  font-family:'Orbitron',monospace;
+  font-size:0.65rem;
+  letter-spacing:0.15em;
+  color:var(--purple-light);
+  text-transform:uppercase;
+}
+
+/* ===== LIFE BAR ===== */
+.life-bar-wrap{
+  position:fixed;
+  top:70px;left:2rem;right:2rem;
+  z-index:20;
+  height:4px;
+}
+.life-bar-wrap.hidden{display:none}
+.life-bar-bg{
+  width:100%;height:100%;
+  background:rgba(124,58,237,0.15);
+  border-radius:2px;
+}
+.life-bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--purple),var(--orange));
+  border-radius:2px;
+  transition:width 0.4s ease;
+  box-shadow:0 0 10px rgba(255,107,0,0.5);
+}
+
+/* ===== GAME AREA ===== */
+#game-area{
+  position:fixed;
+  inset:80px 0 0;
+  z-index:15;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+}
+#game-area.hidden{display:none}
+
+/* Phase announcement */
+#phase-announce{
+  position:fixed;
+  inset:0;
+  z-index:50;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:rgba(10,0,16,0.85);
+  animation:announceIn 0.3s ease forwards;
+  pointer-events:none;
+}
+#phase-announce.out{animation:announceOut 0.4s ease forwards}
+#phase-announce.hidden{display:none}
+
+@keyframes announceIn{from{opacity:0;transform:scale(1.1)}to{opacity:1;transform:scale(1)}}
+@keyframes announceOut{from{opacity:1}to{opacity:0}}
+
+.announce-phase{
+  font-family:'Orbitron',monospace;
+  font-size:0.8rem;
+  letter-spacing:0.4em;
+  color:var(--purple-light);
+  text-transform:uppercase;
+  margin-bottom:0.5rem;
+}
+.announce-number{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(5rem,15vw,10rem);
+  color:var(--orange);
+  text-shadow:0 0 60px rgba(255,107,0,0.8);
+  line-height:1;
+}
+.announce-name{
+  font-family:'Orbitron',monospace;
+  font-size:clamp(0.9rem,2vw,1.4rem);
+  font-weight:700;
+  color:var(--white);
+  letter-spacing:0.15em;
+  margin-top:0.5rem;
+}
+.announce-sub{
+  font-size:0.75rem;
+  color:var(--purple-light);
+  margin-top:1rem;
+  letter-spacing:0.1em;
+}
+
+/* ===== WORD DISPLAY ===== */
+.word-container{
+  position:relative;
+  text-align:center;
+  margin-bottom:1.5rem;
+  padding:0 2rem;
+  max-width:900px;
+  width:100%;
+}
+
+/* Target word (top) */
+#target-word{
+  font-family:'Orbitron',monospace;
+  font-size:clamp(1.8rem,5vw,3.5rem);
+  font-weight:900;
+  letter-spacing:0.08em;
+  margin-bottom:1rem;
+  min-height:1.2em;
+}
+
+.target-char{
+  display:inline-block;
+  transition:color 0.08s,text-shadow 0.08s;
+  color:rgba(240,232,255,0.25);
+}
+.target-char.typed-correct{color:var(--green);text-shadow:0 0 15px rgba(0,255,136,0.5)}
+.target-char.typed-wrong{
+  color:var(--red);
+  text-shadow:0 0 15px rgba(255,34,85,0.6);
+  animation:charShake 0.15s ease;
+}
+.target-char.cursor{
+  color:var(--white);
+  border-bottom:3px solid var(--purple-glow);
+  animation:charBlink 0.8s step-end infinite;
+}
+@keyframes charBlink{0%,100%{border-color:var(--purple-glow)}50%{border-color:transparent}}
+@keyframes charShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+
+/* Word context (smaller words around) */
+.word-queue{
+  display:flex;
+  justify-content:center;
+  gap:1rem;
+  flex-wrap:wrap;
+  max-width:700px;
+  margin:0 auto 1.5rem;
+  min-height:2rem;
+}
+.queue-word{
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.9rem;
+  color:rgba(124,58,237,0.4);
+  letter-spacing:0.05em;
+  transition:all 0.2s;
+}
+.queue-word.next{color:rgba(168,85,247,0.7)}
+
+/* ===== INPUT DISPLAY ===== */
+.input-display{
+  font-family:'Orbitron',monospace;
+  font-size:clamp(1.2rem,3vw,2rem);
+  font-weight:700;
+  letter-spacing:0.1em;
+  color:var(--orange-light);
+  text-shadow:0 0 20px rgba(255,107,0,0.4);
+  min-height:1.5em;
+  margin-bottom:1rem;
+  text-align:center;
+}
+.input-display.has-error{
+  color:var(--red);
+  animation:inputShake 0.2s ease;
+}
+@keyframes inputShake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-6px)}
+  40%{transform:translateX(6px)}
+  60%{transform:translateX(-4px)}
+  80%{transform:translateX(4px)}
+}
+
+/* Hidden real input */
+#real-input{
+  position:fixed;
+  opacity:0;
+  pointer-events:none;
+  top:-100px;
+}
+
+/* ===== COMBO POPUP ===== */
+.combo-popup{
+  position:fixed;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  font-family:'Bebas Neue',sans-serif;
+  font-size:4rem;
+  color:var(--green);
+  text-shadow:0 0 40px rgba(0,255,136,0.8);
+  pointer-events:none;
+  z-index:100;
+  opacity:0;
+}
+.combo-popup.show{animation:comboAnim 0.8s ease forwards}
+@keyframes comboAnim{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(0.5)}
+  30%{opacity:1;transform:translate(-50%,-60%) scale(1.2)}
+  70%{opacity:0.8;transform:translate(-50%,-80%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-120%) scale(0.9)}
+}
+
+/* ===== PROGRESS DOTS ===== */
+.phase-progress{
+  display:flex;
+  gap:0.6rem;
+  margin-bottom:1.5rem;
+}
+.prog-dot{
+  width:8px;height:8px;
+  border-radius:50%;
+  background:rgba(124,58,237,0.2);
+  border:1px solid rgba(124,58,237,0.3);
+  transition:all 0.3s;
+}
+.prog-dot.done{background:var(--green);border-color:var(--green);box-shadow:0 0 8px var(--green)}
+.prog-dot.current{background:var(--orange);border-color:var(--orange);box-shadow:0 0 10px var(--orange);animation:dotPulse 0.8s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.4)}}
+
+/* ===== PERFECT FLASH ===== */
+.perfect-flash{
+  position:fixed;
+  inset:0;
+  background:rgba(0,255,136,0.08);
+  z-index:200;
+  pointer-events:none;
+  opacity:0;
+}
+.perfect-flash.show{animation:flashIn 0.4s ease forwards}
+@keyframes flashIn{0%{opacity:1}100%{opacity:0}}
+
+/* ===== ERROR FLASH ===== */
+.error-flash{
+  position:fixed;
+  inset:0;
+  background:rgba(255,34,85,0.12);
+  z-index:200;
+  pointer-events:none;
+  opacity:0;
+}
+.error-flash.show{animation:flashIn 0.3s ease forwards}
+
+/* ===== RESULT SCREEN ===== */
+#screen-result{
+  text-align:center;
+  background:rgba(10,0,16,0.95);
+}
+
+.result-header{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3rem,8vw,6rem);
+  letter-spacing:0.05em;
+  line-height:1;
+  margin-bottom:0.5rem;
+}
+.result-header.win{color:var(--orange);text-shadow:0 0 40px rgba(255,107,0,0.6)}
+.result-header.lose{color:var(--red);text-shadow:0 0 40px rgba(255,34,85,0.5)}
+
+.result-sub{
+  font-family:'Orbitron',monospace;
+  font-size:0.7rem;
+  letter-spacing:0.3em;
+  color:var(--purple-light);
+  margin-bottom:2.5rem;
+}
+
+.result-stats{
+  display:flex;
+  gap:1.5rem;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-bottom:2.5rem;
+}
+.r-stat{
+  background:rgba(124,58,237,0.1);
+  border:1px solid rgba(124,58,237,0.25);
+  padding:1.2rem 1.8rem;
+  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+  min-width:120px;
+}
+.r-val{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2.5rem;
+  display:block;
+  line-height:1;
+}
+.r-lbl{
+  font-size:0.6rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--purple-light);
+  margin-top:4px;
+}
+
+.new-record{
+  font-family:'Orbitron',monospace;
+  font-size:0.8rem;
+  letter-spacing:0.2em;
+  color:var(--yellow);
+  margin-bottom:1.5rem;
+  animation:pulseYellow 1s ease-in-out infinite;
+}
+@keyframes pulseYellow{0%,100%{opacity:1}50%{opacity:0.5}}
+
+.result-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+
+.btn-game{
+  font-family:'Orbitron',monospace;
+  font-size:0.8rem;
+  font-weight:700;
+  letter-spacing:0.15em;
+  padding:0.8rem 2rem;
+  cursor:pointer;
+  text-transform:uppercase;
+  border:2px solid;
+  background:transparent;
+  transition:all 0.2s;
+  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+}
+.btn-game.orange{border-color:var(--orange);color:var(--orange)}
+.btn-game.orange:hover{background:var(--orange);color:var(--bg)}
+.btn-game.purple{border-color:var(--purple-light);color:var(--purple-light)}
+.btn-game.purple:hover{background:var(--purple-light);color:var(--bg)}
+
+/* Countdown timer ring */
+.timer-ring-wrap{
+  position:relative;
+  width:70px;height:70px;
+  margin:0 auto 1rem;
+}
+#timer-ring{transform:rotate(-90deg)}
+#timer-ring-track{fill:none;stroke:rgba(124,58,237,0.15);stroke-width:4}
+#timer-ring-fill{
+  fill:none;
+  stroke:var(--orange);
+  stroke-width:4;
+  stroke-linecap:round;
+  stroke-dasharray:188;
+  stroke-dashoffset:0;
+  transition:stroke-dashoffset 1s linear, stroke 0.5s;
+  filter:drop-shadow(0 0 6px rgba(255,107,0,0.7));
+}
+.timer-ring-num{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.8rem;
+  color:var(--white);
+}
+
+/* click to type hint */
+.click-hint{
+  font-size:0.7rem;
+  letter-spacing:0.15em;
+  color:rgba(168,85,247,0.5);
+  text-transform:uppercase;
+  margin-top:0.5rem;
+  animation:hintBlink 1.5s ease-in-out infinite;
+}
+@keyframes hintBlink{0%,100%{opacity:0.5}50%{opacity:1}}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="perfect-flash" id="perfect-flash"></div>
+<div class="error-flash" id="error-flash"></div>
+<div class="combo-popup" id="combo-popup"></div>
+<input id="real-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div class="hud-left">
+    <div class="hud-stat" id="hud-score">
+      <span class="hud-val" id="val-score">0</span>
+      <div class="hud-lbl">Pontos</div>
+    </div>
+    <div class="hud-stat" id="hud-combo">
+      <span class="hud-val" id="val-combo">x1</span>
+      <div class="hud-lbl">Combo</div>
+    </div>
+  </div>
+  <div class="hud-center" id="hud-phase">
+    <span class="hud-val" id="val-phase">FASE 1</span>
+    <div class="phase-name" id="val-phase-name">INICIANTE</div>
+  </div>
+  <div class="hud-right">
+    <div class="hud-stat" id="hud-accuracy">
+      <span class="hud-val" id="val-accuracy">100%</span>
+      <div class="hud-lbl">Precisão</div>
+    </div>
+    <div class="hud-stat" id="hud-lives">
+      <span class="hud-val" id="val-lives">❤❤❤</span>
+      <div class="hud-lbl">Vidas</div>
+    </div>
+  </div>
+</div>
+
+<!-- Life bar -->
+<div class="life-bar-wrap hidden" id="life-bar-wrap">
+  <div class="life-bar-bg"><div class="life-bar-fill" id="life-bar-fill" style="width:100%"></div></div>
+</div>
+
+<!-- TITLE SCREEN -->
+<div class="screen" id="screen-title">
+  <div class="logo-wrap">
+    <span class="logo-the">the</span>
+    <span class="logo-highway">highway</span>
+  </div>
+  <div class="subtitle">Jogo de Digitação · Precisão é Tudo</div>
+  <button class="start-btn" id="btn-start">▶ INICIAR JOGO</button>
+  <div class="high-score-display">Recorde: <span id="title-highscore">0</span> pts</div>
+</div>
+
+<!-- GAME AREA -->
+<div id="game-area" class="hidden">
+  <!-- Phase announce overlay -->
+  <div id="phase-announce" class="hidden">
+    <div class="announce-phase">Fase</div>
+    <div class="announce-number" id="ann-num">1</div>
+    <div class="announce-name" id="ann-name">INICIANTE</div>
+    <div class="announce-sub" id="ann-sub">Complete as palavras sem erros</div>
+  </div>
+
+  <div class="phase-progress" id="phase-progress"></div>
+
+  <!-- Timer ring -->
+  <div class="timer-ring-wrap">
+    <svg id="timer-ring" width="70" height="70" viewBox="0 0 70 70">
+      <circle id="timer-ring-track" cx="35" cy="35" r="30"/>
+      <circle id="timer-ring-fill" cx="35" cy="35" r="30"/>
+    </svg>
+    <div class="timer-ring-num" id="timer-num">—</div>
+  </div>
+
+  <div class="word-queue" id="word-queue"></div>
+
+  <div class="word-container">
+    <div id="target-word"></div>
+    <div class="input-display" id="input-display">_</div>
+    <div class="click-hint" id="click-hint">Clique aqui para digitar</div>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div class="screen hidden" id="screen-result">
+  <div class="result-header" id="res-header">GAME OVER</div>
+  <div class="result-sub" id="res-sub">SESSÃO ENCERRADA</div>
+  <div class="new-record hidden" id="new-record">★ NOVO RECORDE ★</div>
+  <div class="result-stats">
+    <div class="r-stat"><span class="r-val" id="rs-score" style="color:var(--yellow)">0</span><div class="r-lbl">Pontuação</div></div>
+    <div class="r-stat"><span class="r-val" id="rs-phase" style="color:var(--orange)">1</span><div class="r-lbl">Fase atingida</div></div>
+    <div class="r-stat"><span class="r-val" id="rs-accuracy" style="color:var(--purple-glow)">100%</span><div class="r-lbl">Precisão</div></div>
+    <div class="r-stat"><span class="r-val" id="rs-combo" style="color:var(--green)">x1</span><div class="r-lbl">Combo máx</div></div>
+    <div class="r-stat"><span class="r-val" id="rs-words" style="color:var(--white)">0</span><div class="r-lbl">Palavras</div></div>
+  </div>
+  <div class="result-btns">
+    <button class="btn-game orange" id="btn-restart">↺ Jogar Novamente</button>
+    <button class="btn-game purple" id="btn-menu">← Menu</button>
+  </div>
+</div>
+
+<script>
+// ===== BACKGROUND CANVAS =====
+const bgCanvas = document.getElementById('bg-canvas');
+const bgCtx = bgCanvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas(){
+  bgCanvas.width = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function createParticles(){
+  particles = [];
+  for(let i=0;i<60;i++){
+    particles.push({
+      x:Math.random()*bgCanvas.width,
+      y:Math.random()*bgCanvas.height,
+      size:Math.random()*1.5+0.5,
+      speedY:-(Math.random()*0.3+0.1),
+      speedX:(Math.random()-0.5)*0.2,
+      opacity:Math.random()*0.5+0.1,
+      color:Math.random()<0.7?'124,58,237':'255,107,0'
+    });
+  }
+}
+createParticles();
+
+function animateBg(){
+  bgCtx.fillStyle='rgba(10,0,16,0.15)';
+  bgCtx.fillRect(0,0,bgCanvas.width,bgCanvas.height);
+  particles.forEach(p=>{
+    bgCtx.beginPath();
+    bgCtx.arc(p.x,p.y,p.size,0,Math.PI*2);
+    bgCtx.fillStyle=`rgba(${p.color},${p.opacity})`;
+    bgCtx.fill();
+    p.y+=p.speedY;p.x+=p.speedX;
+    if(p.y<-5){p.y=bgCanvas.height+5;p.x=Math.random()*bgCanvas.width}
+  });
+  requestAnimationFrame(animateBg);
+}
+animateBg();
+
+// ===== GAME DATA =====
+const PHASES = [
+  {
+    id:1,name:'INICIANTE',
+    words:['casa','gato','pato','mão','sol','mar','céu','flor','pão','lua','voz','fio','paz','asa','dor'],
+    timePerWord:12,count:6,pointsBase:100,
+    tip:'Digite a palavra exibida. Cada erro custa uma vida!'
+  },
+  {
+    id:2,name:'BÁSICO',
+    words:['mesa','tigre','forca','braço','chave','pedra','nuvem','campo','folha','caixa','porta','livro','fruta','ponte','praia'],
+    timePerWord:10,count:8,pointsBase:150,
+    tip:'Velocidade aumenta. Mantenha o combo sem errar!'
+  },
+  {
+    id:3,name:'INTERMEDIÁRIO',
+    words:['janela','teclado','floresta','viagem','caneta','balança','espelho','cabeça','coração','estrada','sorriso','criança','trabalho','memória','sistema'],
+    timePerWord:9,count:10,pointsBase:200,
+    tip:'Palavras maiores. Combo x3 vale pontos extras!'
+  },
+  {
+    id:4,name:'AVANÇADO',
+    words:['computador','biblioteca','fotografia','democracia','felicidade','dicionário','secretaria','desenvolvimento','temperatura','electricidade','astronauta','investigação','velocidade','conhecimento','responsável'],
+    timePerWord:8,count:10,pointsBase:300,
+    tip:'Cuidado com acentos! Precisão absoluta aqui.'
+  },
+  {
+    id:5,name:'ESPECIALISTA',
+    words:['extraordinário','incompreensível','responsabilidade','telecomunicações','desenvolvimento','inconstitucional','multidisciplinar','estabelecimento','administrativo','comportamento','circunstancial','independência','contemporâneo','revolucionário','infraestrutura'],
+    timePerWord:7,count:12,pointsBase:500,
+    tip:'Fase final. Zero erros = bônus máximo!'
+  },
+];
+
+// ===== STATE =====
+let gameState = {
+  phase:0, wordIndex:0, wordsInPhase:[],
+  score:0, lives:3, maxLives:3,
+  combo:1, maxCombo:1,
+  totalWords:0, totalErrors:0, totalCorrect:0,
+  highScore: parseInt(localStorage.getItem('hw_hs')||'0'),
+  timer:null, timeLeft:0,
+  typed:'', hasError:false,
+  active:false,
+};
+
+// ===== UI ELEMENTS =====
+const screenTitle = document.getElementById('screen-title');
+const screenResult = document.getElementById('screen-result');
+const gameArea = document.getElementById('game-area');
+const hud = document.getElementById('hud');
+const lifeBarWrap = document.getElementById('life-bar-wrap');
+const phaseAnnounce = document.getElementById('phase-announce');
+const targetWordEl = document.getElementById('target-word');
+const inputDisplay = document.getElementById('input-display');
+const wordQueue = document.getElementById('word-queue');
+const realInput = document.getElementById('real-input');
+const clickHint = document.getElementById('click-hint');
+const comboPopup = document.getElementById('combo-popup');
+const timerNum = document.getElementById('timer-num');
+const timerFill = document.getElementById('timer-ring-fill');
+const phaseProgress = document.getElementById('phase-progress');
+
+function showScreen(name){
+  [screenTitle, gameArea, screenResult].forEach(s=>s.classList.add('hidden'));
+  hud.classList.add('hidden');
+  lifeBarWrap.classList.add('hidden');
+  if(name==='title') screenTitle.classList.remove('hidden');
+  if(name==='game'){
+    gameArea.classList.remove('hidden');
+    hud.classList.remove('hidden');
+    lifeBarWrap.classList.remove('hidden');
+  }
+  if(name==='result') screenResult.classList.remove('hidden');
+}
+
+// ===== INIT GAME =====
+function startGame(){
+  gameState = {
+    phase:0, wordIndex:0, wordsInPhase:[],
+    score:0, lives:3, maxLives:3,
+    combo:1, maxCombo:1,
+    totalWords:0, totalErrors:0, totalCorrect:0,
+    highScore: parseInt(localStorage.getItem('hw_hs')||'0'),
+    timer:null, timeLeft:0,
+    typed:'', hasError:false,
+    active:false,
+  };
+  showScreen('game');
+  startPhase(0);
+}
+
+function startPhase(phaseIdx){
+  if(phaseIdx >= PHASES.length){ endGame(true); return; }
+  const phase = PHASES[phaseIdx];
+  gameState.phase = phaseIdx;
+  gameState.wordIndex = 0;
+  // Pick random words for this phase
+  const shuffled = [...phase.words].sort(()=>Math.random()-0.5);
+  gameState.wordsInPhase = shuffled.slice(0, phase.count);
+
+  // Build progress dots
+  phaseProgress.innerHTML = '';
+  for(let i=0;i<phase.count;i++){
+    const dot = document.createElement('div');
+    dot.className='prog-dot';
+    dot.id=`dot-${i}`;
+    phaseProgress.appendChild(dot);
+  }
+
+  updateHUD();
+  showAnnounce(phaseIdx, ()=>{ startWord(); });
+}
+
+function showAnnounce(phaseIdx, cb){
+  const phase = PHASES[phaseIdx];
+  document.getElementById('ann-num').textContent = phase.id;
+  document.getElementById('ann-name').textContent = phase.name;
+  document.getElementById('ann-sub').textContent = phase.tip;
+  phaseAnnounce.classList.remove('hidden','out');
+  gameState.active = false;
+  setTimeout(()=>{
+    phaseAnnounce.classList.add('out');
+    setTimeout(()=>{ phaseAnnounce.classList.add('hidden'); phaseAnnounce.classList.remove('out'); cb(); },400);
+  }, 2200);
+}
+
+function startWord(){
+  if(gameState.wordIndex >= gameState.wordsInPhase.length){
+    // Phase complete!
+    phaseComplete();
+    return;
+  }
+  const phase = PHASES[gameState.phase];
+  const word = gameState.wordsInPhase[gameState.wordIndex];
+
+  gameState.typed='';
+  gameState.hasError=false;
+  gameState.active=true;
+  gameState.timeLeft = phase.timePerWord;
+
+  renderTargetWord(word,'');
+  renderQueue();
+  updateInputDisplay('', false);
+  clickHint.style.display='block';
+
+  // Update dot
+  updateDots();
+
+  // Start countdown
+  clearInterval(gameState.timer);
+  timerNum.textContent = gameState.timeLeft;
+  updateTimerRing(gameState.timeLeft, phase.timePerWord);
+
+  gameState.timer = setInterval(()=>{
+    gameState.timeLeft--;
+    timerNum.textContent = gameState.timeLeft;
+    updateTimerRing(gameState.timeLeft, phase.timePerWord);
+    if(gameState.timeLeft<=3) timerFill.style.stroke='var(--red)';
+    else timerFill.style.stroke='var(--orange)';
+    if(gameState.timeLeft<=0){
+      clearInterval(gameState.timer);
+      timeOut();
+    }
+  },1000);
+
+  realInput.value='';
+  realInput.focus();
+}
+
+function updateTimerRing(current, max){
+  const circumference = 188;
+  const pct = current / max;
+  timerFill.style.strokeDashoffset = circumference * (1 - pct);
+}
+
+function renderTargetWord(word, typed){
+  targetWordEl.innerHTML = '';
+  [...word].forEach((ch, i)=>{
+    const span = document.createElement('span');
+    span.className = 'target-char';
+    span.textContent = ch;
+    if(i < typed.length){
+      if(typed[i]===ch) span.classList.add('typed-correct');
+      else span.classList.add('typed-wrong');
+    } else if(i===typed.length){
+      span.classList.add('cursor');
+    }
+    targetWordEl.appendChild(span);
+  });
+}
+
+function renderQueue(){
+  wordQueue.innerHTML='';
+  const remaining = gameState.wordsInPhase.slice(gameState.wordIndex+1, gameState.wordIndex+5);
+  remaining.forEach((w,i)=>{
+    const d=document.createElement('div');
+    d.className='queue-word'+(i===0?' next':'');
+    d.textContent=w;
+    wordQueue.appendChild(d);
+  });
+}
+
+function updateInputDisplay(typed, err){
+  inputDisplay.textContent = typed || '_';
+  inputDisplay.className = 'input-display'+(err?' has-error':'');
+}
+
+function updateDots(){
+  const phase = PHASES[gameState.phase];
+  for(let i=0;i<phase.count;i++){
+    const dot = document.getElementById(`dot-${i}`);
+    if(!dot) continue;
+    dot.className='prog-dot';
+    if(i<gameState.wordIndex) dot.classList.add('done');
+    else if(i===gameState.wordIndex) dot.classList.add('current');
+  }
+}
+
+function updateHUD(){
+  const phase = PHASES[gameState.phase];
+  document.getElementById('val-score').textContent = gameState.score.toLocaleString();
+  document.getElementById('val-phase').textContent = `FASE ${phase.id}`;
+  document.getElementById('val-phase-name').textContent = phase.name;
+  document.getElementById('val-combo').textContent = `x${gameState.combo}`;
+
+  const hearts = '❤'.repeat(gameState.lives) + '🖤'.repeat(Math.max(0,gameState.maxLives-gameState.lives));
+  document.getElementById('val-lives').textContent = hearts;
+
+  const total = gameState.totalCorrect + gameState.totalErrors;
+  const acc = total>0 ? Math.round((gameState.totalCorrect/total)*100) : 100;
+  document.getElementById('val-accuracy').textContent = acc+'%';
+
+  const lifePct = (gameState.lives/gameState.maxLives)*100;
+  document.getElementById('life-bar-fill').style.width = lifePct+'%';
+}
+
+// ===== INPUT HANDLING =====
+document.addEventListener('click', ()=>{ if(gameState.active) realInput.focus(); });
+document.addEventListener('keydown', ()=>{ if(gameState.active) realInput.focus(); });
+
+realInput.addEventListener('input', handleInput);
+realInput.addEventListener('keydown', e=>{
+  if(e.key==='Backspace'){
+    if(gameState.typed.length>0){
+      gameState.typed=gameState.typed.slice(0,-1);
+      renderTargetWord(currentWord(), gameState.typed);
+      updateInputDisplay(gameState.typed, false);
+      gameState.hasError=false;
+    }
+    e.preventDefault();
+  }
+});
+
+function currentWord(){
+  return gameState.wordsInPhase[gameState.wordIndex]||'';
+}
+
+function handleInput(e){
+  if(!gameState.active) return;
+  clickHint.style.display='none';
+
+  const word = currentWord();
+  const val = realInput.value;
+  const ch = val.slice(-1);
+  realInput.value='';
+
+  if(!ch) return;
+
+  const nextIdx = gameState.typed.length;
+
+  if(nextIdx >= word.length) return; // already full
+
+  if(ch === word[nextIdx]){
+    // Correct
+    gameState.typed += ch;
+    gameState.totalCorrect++;
+    renderTargetWord(word, gameState.typed);
+    updateInputDisplay(gameState.typed, false);
+
+    if(gameState.typed === word){
+      wordComplete();
+    }
+  } else {
+    // Wrong
+    gameState.totalErrors++;
+    gameState.hasError=true;
+    loseLife();
+    updateInputDisplay(gameState.typed+'?', true);
+    renderTargetWord(word, gameState.typed+'X');
+    // Flash red
+    flashError();
+    // Reset display after brief moment
+    setTimeout(()=>{
+      if(gameState.active){
+        renderTargetWord(word, gameState.typed);
+        updateInputDisplay(gameState.typed, false);
+      }
+    }, 300);
+  }
+  updateHUD();
+}
+
+function wordComplete(){
+  clearInterval(gameState.timer);
+  gameState.active=false;
+  gameState.totalWords++;
+
+  const phase = PHASES[gameState.phase];
+  const timeBonus = Math.floor(gameState.timeLeft * 20);
+  const comboBonus = gameState.combo;
+  const points = (phase.pointsBase + timeBonus) * comboBonus;
+  gameState.score += points;
+  gameState.combo = Math.min(gameState.combo+1, 8);
+  gameState.maxCombo = Math.max(gameState.maxCombo, gameState.combo);
+
+  flashPerfect();
+  if(gameState.combo>2) showComboPopup(gameState.combo);
+
+  // Mark dot done
+  const dot = document.getElementById(`dot-${gameState.wordIndex}`);
+  if(dot){ dot.classList.remove('current'); dot.classList.add('done'); }
+
+  gameState.wordIndex++;
+  updateHUD();
+  setTimeout(startWord, 500);
+}
+
+function loseLife(){
+  gameState.lives = Math.max(0, gameState.lives-1);
+  gameState.combo = 1;
+  updateHUD();
+  if(gameState.lives<=0){
+    clearInterval(gameState.timer);
+    gameState.active=false;
+    setTimeout(()=>endGame(false),400);
+  }
+}
+
+function timeOut(){
+  flashError();
+  loseLife();
+  if(gameState.lives>0){
+    // Skip word, penalize
+    gameState.wordIndex++;
+    gameState.active=false;
+    setTimeout(startWord, 500);
+  }
+}
+
+function phaseComplete(){
+  // Bonus lives (max 1 extra)
+  if(gameState.lives < gameState.maxLives) gameState.lives = Math.min(gameState.maxLives, gameState.lives+1);
+  // Phase bonus
+  gameState.score += 1000 * (gameState.phase+1);
+  updateHUD();
+  startPhase(gameState.phase+1);
+}
+
+function endGame(won){
+  clearInterval(gameState.timer);
+  gameState.active=false;
+
+  const total = gameState.totalCorrect+gameState.totalErrors;
+  const acc = total>0?Math.round((gameState.totalCorrect/total)*100):100;
+  const isRecord = gameState.score > gameState.highScore;
+
+  if(isRecord){
+    localStorage.setItem('hw_hs', gameState.score);
+    document.getElementById('title-highscore').textContent = gameState.score.toLocaleString();
+  }
+
+  document.getElementById('res-header').textContent = won ? 'VITÓRIA!' : 'GAME OVER';
+  document.getElementById('res-header').className = 'result-header '+(won?'win':'lose');
+  document.getElementById('res-sub').textContent = won ? 'VOCÊ COMPLETOU TODAS AS FASES!' : 'SUAS VIDAS ACABARAM';
+  document.getElementById('rs-score').textContent = gameState.score.toLocaleString();
+  document.getElementById('rs-phase').textContent = PHASES[Math.min(gameState.phase,PHASES.length-1)].id;
+  document.getElementById('rs-accuracy').textContent = acc+'%';
+  document.getElementById('rs-combo').textContent = 'x'+gameState.maxCombo;
+  document.getElementById('rs-words').textContent = gameState.totalWords;
+  document.getElementById('new-record').classList.toggle('hidden', !isRecord);
+
+  showScreen('result');
+}
+
+function flashPerfect(){
+  const el=document.getElementById('perfect-flash');
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+function flashError(){
+  const el=document.getElementById('error-flash');
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function showComboPopup(combo){
+  comboPopup.textContent = `COMBO x${combo}!`;
+  comboPopup.classList.remove('show');
+  void comboPopup.offsetWidth;
+  comboPopup.classList.add('show');
+}
+
+// ===== BUTTONS =====
+document.getElementById('btn-start').addEventListener('click', startGame);
+document.getElementById('btn-restart').addEventListener('click', startGame);
+document.getElementById('btn-menu').addEventListener('click', ()=>{
+  document.getElementById('title-highscore').textContent = (parseInt(localStorage.getItem('hw_hs')||'0')).toLocaleString();
+  showScreen('title');
+});
+
+// ===== INIT =====
+document.getElementById('title-highscore').textContent = gameState.highScore.toLocaleString();
+showScreen('title');
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The(banco) Highway - Ditado Digitado</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <span class="the">The(banco)</span>
+            <span class="highway">Highway</span>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="game-header">
+                <h1>Fase <span id="current-phase-num">1</span>/20: <span id="phase-name">Início</span></h1>
+                <p>Atinga as metas para desbloquear a próxima fase!</p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-box">
+                    <span class="label">PPM</span>
+                    <span id="wpm">0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="label">Precisão</span>
+                    <span id="accuracy">100%</span>
+                </div>
+                <div class="stat-box">
+                    <span class="label">Tempo</span>
+                    <span id="timer">0s</span>
+                </div>
+                <div class="stat-box goal-box">
+                    <span class="label">Meta PPM</span>
+                    <span id="target-ppm">20</span>
+                </div>
+            </div>
+
+            <div class="track">
+                <div id="car" class="car">🚗</div>
+            </div>
+
+            <div id="text-display" class="text-display">
+                <!-- O texto será inserido aqui via JS -->
+            </div>
+
+            <div class="controls-row">
+                <div class="voice-selector">
+                    <label for="voice-select">Voz:</label>
+                    <select id="voice-select">
+                        <option value="">Carregando vozes...</option>
+                    </select>
+                </div>
+                <div class="audio-controls">
+                    <button id="listen-btn">🔊 Ouvir Texto</button>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="typing-input" placeholder="Comece a digitar aqui..." autocomplete="off">
+                <button id="reset-btn">Reiniciar</button>
+            </div>
+            
+            <div id="message-display" class="message-display"></div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Highway — Atividade de Digitação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="logo"><span style="color: rgb(255, 255, 255);">The </span><span style="color: orange;">Highway</span></div>
+  <div class="badge-level" id="badgeLevel">Iniciante</div>
+</header>
+
+<!-- SETUP SCREEN -->
+<div class="screen active" id="screenSetup">
+  <div class="setup-wrap">
+    <h1 class="setup-title">Atividade de Digitação</h1>
+    <p class="setup-sub">Escolha seu nível, configure os critérios e avance pelas fases!</p>
+
+    <div class="section-label">Escolha o nível</div>
+    <div class="levels-grid">
+      <div class="level-card selected" data-level="infantil" onclick="selectLevel(this)">
+        <div class="lc-badge">NOVO</div>
+        <div class="lc-icon">🌟</div>
+        <div class="lc-name">Infantil</div>
+        <div class="lc-desc">Palavras simples e divertidas para os pequenos</div>
+      </div>
+      <div class="level-card" data-level="iniciante" onclick="selectLevel(this)">
+        <div class="lc-icon">🌱</div>
+        <div class="lc-name">Iniciante</div>
+        <div class="lc-desc">Frases curtas e vocabulário do dia a dia</div>
+      </div>
+      <div class="level-card" data-level="intermediario" onclick="selectLevel(this)">
+        <div class="lc-icon">🚀</div>
+        <div class="lc-name">Intermediário</div>
+        <div class="lc-desc">Frases variadas com pontuação e vírgulas</div>
+      </div>
+      <div class="level-card" data-level="avancado" onclick="selectLevel(this)">
+        <div class="lc-icon">⚡</div>
+        <div class="lc-name">Avançado</div>
+        <div class="lc-desc">Textos longos e complexos com acentos</div>
+      </div>
+    </div>
+
+    <div class="section-label">Configure os critérios para avançar</div>
+    <div class="config-grid">
+      <div class="config-card">
+        <div class="config-card-title">⏱ Tempo máximo</div>
+        <div class="config-card-sub">Você deve concluir dentro deste tempo</div>
+        <div class="slider-row">
+          <input type="range" id="sliderTime" min="30" max="180" step="10" value="90" oninput="updateSliders()">
+          <div class="slider-val" id="valTime">90<span class="stat-unit">s</span></div>
+        </div>
+      </div>
+      <div class="config-card">
+        <div class="config-card-title">💨 PPM mínimo</div>
+        <div class="config-card-sub">Palavras por minuto necessárias para avançar</div>
+        <div class="slider-row">
+          <input type="range" id="sliderPPM" min="5" max="100" step="5" value="20" oninput="updateSliders()">
+          <div class="slider-val" id="valPPM">20<span class="stat-unit"> ppm</span></div>
+        </div>
+      </div>
+      <div class="config-card">
+        <div class="config-card-title">🎯 Precisão mínima</div>
+        <div class="config-card-sub">Porcentagem de acertos exigida</div>
+        <div class="slider-row">
+          <input type="range" id="sliderAcc" min="50" max="100" step="5" value="80" oninput="updateSliders()">
+          <div class="slider-val" id="valAcc">80<span class="stat-unit">%</span></div>
+        </div>
+      </div>
+      <div class="config-card">
+        <div class="config-card-title">📚 Número de fases</div>
+        <div class="config-card-sub">Quantas fases completar para vencer</div>
+        <div class="slider-row">
+          <input type="range" id="sliderPhases" min="2" max="8" step="1" value="4" oninput="updateSliders()">
+          <div class="slider-val" id="valPhases">4<span class="stat-unit"> fases</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Fases da atividade</div>
+    <div class="phases-preview">
+      <div class="phases-row" id="phasesPreview"></div>
+    </div>
+
+    <button class="btn-start" onclick="startGame()">Começar Atividade ▶</button>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen" id="screenGame">
+  <div class="game-wrap">
+    <div class="progress-top">
+      <div class="phase-label" id="phaseLabel">Fase 1 de 4</div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Tempo</div>
+        <div class="stat-val" id="statTime">00:00</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">PPM</div>
+        <div class="stat-val" id="statPPM">0</div>
+        <div class="stat-unit">palavras/min</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Precisão</div>
+        <div class="stat-val" id="statAcc">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Erros</div>
+        <div class="stat-val" id="statErr">0</div>
+      </div>
+    </div>
+
+    <div class="criteria-row">
+      <div class="crit-badge pending" id="critTime">
+        <span class="crit-icon">⏱</span>
+        <span id="critTimeText">Tempo: —</span>
+      </div>
+      <div class="crit-badge pending" id="critPPM">
+        <span class="crit-icon">💨</span>
+        <span id="critPPMText">PPM: —</span>
+      </div>
+      <div class="crit-badge pending" id="critAccBadge">
+        <span class="crit-icon">🎯</span>
+        <span id="critAccText">Precisão: —</span>
+      </div>
+    </div>
+
+    <div class="feedback-banner" id="feedbackBanner">
+      <span id="feedbackIcon">✅</span>
+      <span id="feedbackMsg"></span>
+    </div>
+
+    <div class="typing-card">
+      <div class="text-display" id="textDisplay"></div>
+      <textarea class="type-input" id="typeInput" rows="2"
+        placeholder="Clique aqui e comece a digitar..."
+        oninput="handleInput()"
+        onkeydown="handleKeydown(event)"
+        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+      <div class="input-hint" id="inputHint">Pressione <strong>Enter</strong> para confirmar quando terminar</div>
+    </div>
+
+    <button class="btn-secondary" onclick="backToSetup()" style="font-size:14px; padding:10px 20px;">← Voltar ao Menu</button>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div class="screen" id="screenResult">
+  <div class="result-wrap">
+    <div class="trophy" id="resultTrophy">🏆</div>
+    <div class="result-title" id="resultTitle">Parabéns!</div>
+    <div class="result-sub" id="resultSub">Você completou todas as fases com sucesso!</div>
+
+    <div class="result-stats">
+      <div class="rs-card">
+        <div class="rs-val" id="resPPM">—</div>
+        <div class="rs-label">Melhor PPM</div>
+      </div>
+      <div class="rs-card">
+        <div class="rs-val" id="resAcc">—</div>
+        <div class="rs-label">Precisão média</div>
+      </div>
+      <div class="rs-card">
+        <div class="rs-val" id="resPhases">—</div>
+        <div class="rs-label">Fases concluídas</div>
+      </div>
+    </div>
+
+    <div class="phases-summary" id="phasesSummary"></div>
+
+    <button class="btn-secondary" onclick="backToSetup()">🔄 Jogar novamente</button>
+    <button class="btn-start" style="width:auto; padding:14px 32px;" onclick="startGame()">▶ Repetir nível</button>
+  </div>
+</div>
+
+<script>
+// ===================== TEXTS =====================
+const TEXTS = {
+  infantil: [
+    "o gato bebe leite",
+    "o sol é amarelo",
+    "eu gosto de bolo",
+    "a bola é redonda",
+    "o pato nada no lago",
+    "minha mãe me ama",
+    "o cão late alto",
+    "eu como maçã",
+    "a lua brilha à noite",
+    "o peixe vive no mar",
+  ],
+  iniciante: [
+    "o dia estava ensolarado e agradável",
+    "gosto muito de ler livros interessantes",
+    "a criança brincou no parque hoje",
+    "vamos tomar sorvete depois do almoço",
+    "o cachorro corre pelo quintal feliz",
+    "ela bebeu um copo de água gelada",
+    "hoje choveu bastante na cidade",
+    "meu amigo é muito legal e divertido",
+  ],
+  intermediario: [
+    "A tecnologia transformou a maneira como nos comunicamos no mundo moderno.",
+    "Estudar todos os dias é fundamental para alcançar seus objetivos de vida.",
+    "O Brasil é um país de grande diversidade cultural, histórica e natural.",
+    "Praticar esportes regularmente traz muitos benefícios para a saúde física.",
+    "A leitura amplia o vocabulário e desenvolve o pensamento crítico das pessoas.",
+    "Cada pessoa tem sua própria forma de aprender e encarar os desafios.",
+  ],
+  avancado: [
+    "A inteligência artificial está revolucionando diversos setores da economia global, criando novas oportunidades e desafios para profissionais de todas as áreas.",
+    "O desenvolvimento sustentável requer equilíbrio entre crescimento econômico, preservação ambiental e justiça social para as gerações presentes e futuras.",
+    "As descobertas científicas dos últimos séculos transformaram profundamente nossa compreensão do universo, da vida e da natureza humana.",
+    "A educação de qualidade é o alicerce de uma sociedade mais justa, igualitária e capaz de enfrentar os complexos desafios contemporâneos.",
+  ]
+};
+
+// ===================== STATE =====================
+let cfg = { level:'infantil', time:90, ppm:20, acc:80, phases:4 };
+let state = {
+  phase: 0,
+  currentText: '',
+  typed: '',
+  started: false,
+  startTs: 0,
+  elapsed: 0,
+  timer: null,
+  errors: 0,
+  totalChars: 0,
+  wrongChars: 0,
+  phaseResults: [],
+  usedTexts: [],
+};
+
+// ===================== SETUP =====================
+function selectLevel(el) {
+  document.querySelectorAll('.level-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  cfg.level = el.dataset.level;
+}
+
+function updateSliders() {
+  cfg.time   = +document.getElementById('sliderTime').value;
+  cfg.ppm    = +document.getElementById('sliderPPM').value;
+  cfg.acc    = +document.getElementById('sliderAcc').value;
+  cfg.phases = +document.getElementById('sliderPhases').value;
+
+  document.getElementById('valTime').innerHTML   = cfg.time + '<span class="stat-unit">s</span>';
+  document.getElementById('valPPM').innerHTML    = cfg.ppm  + '<span class="stat-unit"> ppm</span>';
+  document.getElementById('valAcc').innerHTML    = cfg.acc  + '<span class="stat-unit">%</span>';
+  document.getElementById('valPhases').innerHTML = cfg.phases + '<span class="stat-unit"> fases</span>';
+
+  renderPhasesPreview();
+}
+
+function renderPhasesPreview() {
+  const row = document.getElementById('phasesPreview');
+  row.innerHTML = '';
+  for (let i = 1; i <= cfg.phases; i++) {
+    row.innerHTML += `<div class="phase-pip"><div class="dot"></div>Fase ${i}</div>`;
+  }
+}
+
+function backToSetup() {
+  clearInterval(state.timer);
+  showScreen('screenSetup');
+  document.getElementById('badgeLevel').style.display = 'none';
+}
+
+// ===================== GAME =====================
+function startGame() {
+  // read current slider values
+  cfg.time   = +document.getElementById('sliderTime').value;
+  cfg.ppm    = +document.getElementById('sliderPPM').value;
+  cfg.acc    = +document.getElementById('sliderAcc').value;
+  cfg.phases = +document.getElementById('sliderPhases').value;
+
+  state = {
+    phase: 0,
+    currentText: '',
+    typed: '',
+    started: false,
+    startTs: 0,
+    elapsed: 0,
+    timer: null,
+    errors: 0,
+    totalChars: 0,
+    wrongChars: 0,
+    phaseResults: [],
+    usedTexts: [],
+  };
+
+  const badge = document.getElementById('badgeLevel');
+  badge.style.display = 'flex';
+  badge.textContent = { infantil:'🌟 Infantil', iniciante:'🌱 Iniciante', intermediario:'🚀 Intermediário', avancado:'⚡ Avançado' }[cfg.level];
+
+  showScreen('screenGame');
+  loadPhase();
+}
+
+function getNextText() {
+  const pool = TEXTS[cfg.level];
+  const available = pool.filter(t => !state.usedTexts.includes(t));
+  if (available.length === 0) { state.usedTexts = []; return pool[Math.floor(Math.random()*pool.length)]; }
+  const t = available[Math.floor(Math.random()*available.length)];
+  state.usedTexts.push(t);
+  return t;
+}
+
+function loadPhase() {
+  clearInterval(state.timer);
+  state.currentText = getNextText();
+  state.typed = '';
+  state.started = false;
+  state.elapsed = 0;
+  state.errors = 0;
+  state.totalChars = 0;
+  state.wrongChars = 0;
+
+  const phaseNum = state.phase + 1;
+  document.getElementById('phaseLabel').textContent = `Fase ${phaseNum} de ${cfg.phases}`;
+  document.getElementById('progressFill').style.width = ((state.phase / cfg.phases) * 100) + '%';
+
+  renderText();
+  updateStats();
+  resetCriteria();
+  hideFeedback();
+
+  const inp = document.getElementById('typeInput');
+  inp.value = '';
+  inp.classList.remove('has-error');
+  inp.disabled = false;
+  inp.focus();
+
+  document.getElementById('inputHint').textContent = 'Clique aqui e comece a digitar...';
+}
+
+function renderText() {
+  const display = document.getElementById('textDisplay');
+  const target = state.currentText;
+  const typed  = state.typed;
+  let html = '';
+
+  for (let i = 0; i < target.length; i++) {
+    if (i < typed.length) {
+      if (typed[i] === target[i]) {
+        html += `<span class="char-correct">${esc(target[i])}</span>`;
+      } else {
+        html += `<span class="char-wrong">${esc(target[i])}</span>`;
+      }
+    } else if (i === typed.length) {
+      html += `<span class="char-cursor">${esc(target[i])}</span>`;
+    } else {
+      html += `<span class="char-pending">${esc(target[i])}</span>`;
+    }
+  }
+  display.innerHTML = html;
+}
+
+function esc(c) {
+  return c === ' ' ? '&nbsp;' : c === '<' ? '&lt;' : c === '>' ? '&gt;' : c;
+}
+
+function handleInput() {
+  const inp = document.getElementById('typeInput');
+  const val = inp.value;
+
+  if (!state.started && val.length > 0) {
+    state.started = true;
+    state.startTs = Date.now();
+    startTimer();
+    document.getElementById('inputHint').textContent = 'Pressione Enter para confirmar quando terminar';
+  }
+
+  const target = state.currentText;
+  const prev = state.typed;
+  state.typed = val;
+
+  // Count errors on new chars
+  for (let i = prev.length; i < val.length; i++) {
+    if (i < target.length) {
+      state.totalChars++;
+      if (val[i] !== target[i]) state.wrongChars++;
+    }
+  }
+
+  // has-error class if current char wrong
+  const pos = val.length - 1;
+  if (val.length > 0 && pos < target.length && val[pos] !== target[pos]) {
+    inp.classList.add('has-error');
+  } else {
+    inp.classList.remove('has-error');
+  }
+
+  renderText();
+  updateStats();
+}
+
+function handleKeydown(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    submitPhase();
+  }
+}
+
+function startTimer() {
+  state.timer = setInterval(() => {
+    state.elapsed = (Date.now() - state.startTs) / 1000;
+    updateStats();
+    if (state.elapsed > cfg.time + 5) {
+      clearInterval(state.timer);
+    }
+  }, 200);
+}
+
+function updateStats() {
+  const elapsed = state.elapsed;
+  const elapsedMin = elapsed / 60;
+  const typed = state.typed;
+  const target = state.currentText;
+
+  // PPM
+  const wordsTyped = typed.trim().split(/\s+/).filter(w=>w).length;
+  const ppm = elapsedMin > 0 ? Math.round(wordsTyped / elapsedMin) : 0;
+
+  // Accuracy
+  let acc = 100;
+  if (state.totalChars > 0) {
+    acc = Math.round(((state.totalChars - state.wrongChars) / state.totalChars) * 100);
+  }
+
+  // Time display
+  const m = Math.floor(elapsed / 60);
+  const s = Math.floor(elapsed % 60);
+  const timeStr = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+  document.getElementById('statTime').textContent = timeStr;
+  document.getElementById('statPPM').textContent  = ppm;
+  document.getElementById('statAcc').textContent  = state.totalChars > 0 ? acc + '%' : '—';
+  document.getElementById('statErr').textContent  = state.wrongChars;
+
+  // Color PPM
+  const ppmEl = document.getElementById('statPPM');
+  ppmEl.className = 'stat-val' + (ppm >= cfg.ppm ? ' good' : ppm > 0 ? ' warn' : '');
+
+  // Color Acc
+  const accEl = document.getElementById('statAcc');
+  accEl.className = 'stat-val' + (acc >= cfg.acc ? ' good' : state.totalChars > 0 ? ' warn' : '');
+
+  // Criteria live
+  if (state.started) {
+    const timeOk = elapsed <= cfg.time;
+    const ppmOk  = ppm >= cfg.ppm;
+    const accOk  = acc >= cfg.acc;
+
+    setCrit('critTime', timeOk, `Tempo: ${Math.round(elapsed)}/${cfg.time}s`);
+    setCrit('critPPM',  ppmOk,  `PPM: ${ppm}/${cfg.ppm}`);
+    setCrit('critAccBadge', accOk, `Precisão: ${acc}%/${cfg.acc}%`);
+  }
+}
+
+function setCrit(id, ok, text) {
+  const el = document.getElementById(id);
+  const textId = id === 'critTime' ? 'critTimeText' : id === 'critPPM' ? 'critPPMText' : 'critAccText';
+  document.getElementById(textId).textContent = text;
+  el.className = 'crit-badge ' + (ok ? 'ok' : 'fail');
+}
+
+function resetCriteria() {
+  ['critTime','critPPM','critAccBadge'].forEach(id => {
+    document.getElementById(id).className = 'crit-badge pending';
+  });
+  document.getElementById('critTimeText').textContent = 'Tempo: —';
+  document.getElementById('critPPMText').textContent  = 'PPM: —';
+  document.getElementById('critAccText').textContent  = 'Precisão: —';
+}
+
+function submitPhase() {
+  if (!state.started) return;
+  clearInterval(state.timer);
+
+  const elapsed = state.elapsed;
+  const typed   = state.typed;
+  const target  = state.currentText;
+
+  const wordsTyped = typed.trim().split(/\s+/).filter(w=>w).length;
+  const ppm = elapsed > 0 ? Math.round(wordsTyped / (elapsed / 60)) : 0;
+  const acc = state.totalChars > 0 ? Math.round(((state.totalChars - state.wrongChars) / state.totalChars) * 100) : 0;
+  const completed = typed.trim().toLowerCase() === target.trim().toLowerCase();
+
+  const timeOk = elapsed <= cfg.time;
+  const ppmOk  = ppm >= cfg.ppm;
+  const accOk  = acc >= cfg.acc;
+  const pass = timeOk && ppmOk && accOk && completed;
+
+  state.phaseResults.push({ phase: state.phase+1, ppm, acc, elapsed: Math.round(elapsed), pass });
+
+  document.getElementById('typeInput').disabled = true;
+
+  if (pass) {
+    state.phase++;
+    if (state.phase >= cfg.phases) {
+      showFeedback('success', '🏆 Atividade concluída! Você superou todos os critérios!');
+      setTimeout(() => showResult(true), 1800);
+    } else {
+      showFeedback('success', `✅ Fase ${state.phase} concluída! Preparando próxima fase...`);
+      setTimeout(() => loadPhase(), 2200);
+    }
+  } else {
+    let reason = [];
+    if (!completed) reason.push('texto incompleto ou incorreto');
+    if (!timeOk)    reason.push(`tempo excedido (${Math.round(elapsed)}s > ${cfg.time}s)`);
+    if (!ppmOk)     reason.push(`PPM abaixo do mínimo (${ppm} < ${cfg.ppm})`);
+    if (!accOk)     reason.push(`precisão insuficiente (${acc}% < ${cfg.acc}%)`);
+    showFeedback('fail', `❌ Tente novamente: ${reason.join(', ')}.`);
+    setTimeout(() => { hideFeedback(); loadPhase(); }, 2800);
+  }
+}
+
+function showFeedback(type, msg) {
+  const b = document.getElementById('feedbackBanner');
+  b.className = 'feedback-banner ' + type;
+  document.getElementById('feedbackMsg').textContent = msg;
+}
+function hideFeedback() {
+  document.getElementById('feedbackBanner').className = 'feedback-banner';
+}
+
+// ===================== RESULT =====================
+function showResult(win) {
+  const results = state.phaseResults;
+  const bestPPM = results.length ? Math.max(...results.map(r=>r.ppm)) : 0;
+  const avgAcc  = results.length ? Math.round(results.reduce((s,r)=>s+r.acc,0)/results.length) : 0;
+  const done    = results.filter(r=>r.pass).length;
+
+  document.getElementById('resPPM').textContent    = bestPPM + ' ppm';
+  document.getElementById('resAcc').textContent    = avgAcc + '%';
+  document.getElementById('resPhases').textContent = `${done}/${cfg.phases}`;
+
+  document.getElementById('resultTrophy').textContent = win ? '🏆' : '💪';
+  document.getElementById('resultTitle').textContent  = win ? 'Parabéns!' : 'Bom esforço!';
+  document.getElementById('resultSub').textContent    = win
+    ? 'Você completou todas as fases com sucesso!'
+    : `Você completou ${done} de ${cfg.phases} fases. Continue praticando!`;
+
+  const summary = document.getElementById('phasesSummary');
+  summary.innerHTML = results.map(r =>
+    `<div class="ps-item" style="background:${r.pass?'var(--green-light)':'var(--red-light)'}; color:${r.pass?'var(--green)':'var(--red)'}; border-color:${r.pass?'#A8D9B8':'#F5BABA'}">
+      ${r.pass?'✅':'❌'} Fase ${r.phase}: ${r.ppm} ppm · ${r.acc}% · ${r.elapsed}s
+    </div>`
+  ).join('');
+
+  showScreen('screenResult');
+}
+
+// ===================== UTILS =====================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// INIT
+updateSliders();
+</script>
+</body>
+</html>

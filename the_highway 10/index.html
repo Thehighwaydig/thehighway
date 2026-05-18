@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Highway - Prática de Digitação</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>The Highway</h1>
+            <p>Acelere sua digitação na estrada do conhecimento.</p>
+        </header>
+
+        <main>
+            <div id="stats">
+                <div class="stat-box">WPM: <span id="wpm">0</span></div>
+                <div class="stat-box">Precisão: <span id="accuracy">100</span>%</div>
+                <div class="stat-box">Tempo: <span id="timer">60</span>s</div>
+            </div>
+
+            <div id="quote-display" class="quote-container">
+                <!-- A frase será carregada aqui via JS -->
+                Carregando frase...
+            </div>
+
+            <textarea id="input-area" placeholder="Comece a digitar aqui..." autofocus></textarea>
+
+            <div class="controls">
+                <button id="reset-btn">Reiniciar</button>
+                <select id="difficulty">
+                    <option value="easy">Fácil</option>
+                    <option value="medium" selected>Médio</option>
+                    <option value="hard">Difícil</option>
+                </select>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 The Highway - Melhore suas habilidades.</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

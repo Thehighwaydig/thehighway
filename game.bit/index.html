@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎮 Professor Bit - Mestre do Teclado</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- TELA: INTRO / SPLASH -->
+    <div id="screen-intro" class="screen active">
+      <div class="scanlines"></div>
+      <div class="crt-border">
+        <div class="pixel-header">
+          <div class="blink-text title-main">★ PROFESSOR BIT ★</div>
+          <div class="title-sub">MESTRE DO TECLADO</div>
+          <div class="title-version">v2.0 - EDIÇÃO TURBO</div>
+        </div>
+        <div class="professor-container">
+          <canvas id="prof-canvas-intro" width="120" height="140"></canvas>
+          <div class="speech-bubble" id="intro-speech">
+            Olá, jovem! Sou o<br>
+            <b>Prof. BIT</b>!<br>
+            Vou te ensinar<br>
+            os segredos do<br>
+            teclado! 🎹
+          </div>
+        </div>
+        <div class="menu-box">
+          <div class="menu-title">[ MENU PRINCIPAL ]</div>
+          <button class="pixel-btn" onclick="showScreen('screen-name')">▶ NOVO JOGO</button>
+          <button class="pixel-btn" onclick="showScreen('screen-ranking')">🏆 RANKING</button>
+          <button class="pixel-btn" onclick="showScreen('screen-credits')">ℹ CRÉDITOS</button>
+        </div>
+        <div class="insert-coin blink-text">— PRESSIONE QUALQUER TECLA —</div>
+      </div>
+    </div>
+
+    <!-- TELA: NOME DO JOGADOR -->
+    <div id="screen-name" class="screen">
+      <div class="scanlines"></div>
+      <div class="crt-border">
+        <div class="pixel-header small">
+          <div class="blink-text title-main">CADASTRO DO ALUNO</div>
+        </div>
+        <div class="center-box">
+          <canvas id="prof-canvas-name" width="80" height="100"></canvas>
+          <div class="speech-bubble small">
+            Qual é o seu<br>nome, aluno?
+          </div>
+        </div>
+        <div class="form-box">
+          <label class="pixel-label">INSIRA SEU NOME:</label>
+          <input type="text" id="player-name-input" class="pixel-input" maxlength="12" placeholder="SEU NOME">
+          <br>
+          <label class="pixel-label">ESCOLHA SEU NÍVEL:</label>
+          <div class="level-select">
+            <button class="level-btn active" data-level="0" onclick="selectStartLevel(0)">🌱 INICIANTE</button>
+            <button class="level-btn" data-level="1" onclick="selectStartLevel(1)">⚡ INTERMEDIÁRIO</button>
+            <button class="level-btn" data-level="2" onclick="selectStartLevel(2)">🔥 AVANÇADO</button>
+          </div>
+          <button class="pixel-btn big" onclick="startGame()">▶ COMEÇAR!</button>
+          <button class="pixel-btn" onclick="showScreen('screen-intro')">◀ VOLTAR</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TELA: MAPA DE FASES -->
+    <div id="screen-map" class="screen">
+      <div class="scanlines"></div>
+      <div class="crt-border">
+        <div class="pixel-header small">
+          <div class="blink-text title-main" id="map-player-name">MAPA - ALUNO: ???</div>
+          <div class="status-bar">
+            <span>⭐ PONTOS: <span id="map-score">0</span></span>
+            <span>🏅 NÍVEL: <span id="map-rank">NOVATO</span></span>
+            <span>❤ VIDAS: <span id="map-lives">3</span></span>
+          </div>
+        </div>
+        <div id="phase-map" class="phase-map"></div>
+        <div class="map-legend">
+          <span>🔒 Bloqueada</span>
+          <span>⭐ Completa</span>
+          <span>▶ Disponível</span>
+        </div>
+        <button class="pixel-btn" onclick="showScreen('screen-intro')">◀ MENU</button>
+      </div>
+    </div>
+
+    <!-- TELA: LIÇÃO (APRENDER) -->
+    <div id="screen-lesson" class="screen">
+      <div class="scanlines"></div>
+      <div class="crt-border">
+        <div class="lesson-header">
+          <div class="lesson-title" id="lesson-title">FASE 1 - AS TECLAS DOS NÚMEROS</div>
+          <div class="lesson-progress">
+            <div class="progress-bar"><div class="progress-fill" id="lesson-progress-fill"></div></div>
+            <span id="lesson-progress-text">0/10</span>
+          </div>
+        </div>
+        <div class="lesson-area">
+          <div class="professor-lesson">
+            <canvas id="prof-canvas-lesson" width="80" height="100"></canvas>
+            <div class="speech-bubble lesson-speech" id="lesson-speech">...</div>
+          </div>
+          <div class="lesson-content" id="lesson-content">
+            <!-- Conteúdo dinâmico -->
+          </div>
+        </div>
+        <div class="lesson-controls">
+          <button class="pixel-btn" id="btn-prev-lesson" onclick="prevLesson()">◀ ANTERIOR</button>
+          <button class="pixel-btn" id="btn-next-lesson" onclick="nextLesson()">PRÓXIMO ▶</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TELA: PRÁTICA -->
+    <div id="screen-practice" class="screen">
+      <div class="scanlines"></div>
+      <div class="crt-border">
+        <div class="lesson-header">
+          <div class="lesson-title" id="practice-title">PRÁTICA - FASE 1</div>
+          <div class="practice-stats">
+            <span>⏱ <span id="practice-timer">60</span>s</span>
+            <span>✅ <span id="practice-correct">0</span></span>
+            <span>❌ <span id="practice-errors">0</span></span>
+            <span>🔥 Combo: <span id="practice-combo">0</span>x</span>
+          </div>
+        </div>
+        <div class="practice-area">
+          <div class="professor-practice">
+            <canvas id="prof-canvas-practice" width="60" height="80"></canvas>
+          </div>
+          <div class="practice-main">
+            <div class="target-display" id="target-display">
+              <div class="target-label">PRESSIONE ESTA TECLA:</div>
+              <div class="target-key" id="target-key">1</div>
+              <div class="target-hint" id="target-hint"></div>
+            </div>
+            <div class="feedback-area" id="feedback-area"></div>
+            <div class="keyboard-visual" id="keyboard-visual"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TELA: DESAFIO (MINI-GAME) -->
+    <div id="screen-challenge" class="screen">
+      <div class="scanlines"></div>
+      <div class="crt-border">
+        <div class="lesson-header">
+          <div class="lesson-title" id="challenge-title">🎯 DESAFIO ESPECIAL!</div>
+          <div class="practice-stats">
+            <span>⏱ <span id="challenge-timer">30</span>s</span>
+            <span>💰 <span id="challenge-score">0</span> pts</span>
+            <span>🔥 Combo: <span id="challenge-combo">0</span>x</span>
+          </div>
+        </div>
+        <div id="challenge-area" class="challenge-area">
+          <!-- Conteúdo do mini-game -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TELA: RESULTADO DA FASE -->
+    <div id="screen-result" class="screen">
+      <div class="scanlines"></div>
+      <div class="crt-border">
+        <div class="result-area">
+          <div class="result-title" id="result-title">FASE COMPLETA!</div>
+          <canvas id="prof-canvas-result" width="100" height="120"></canvas>
+          <div class="result-speech" id="result-speech">Muito bem!</div>
+          <div class="result-stars" id="result-stars">⭐⭐⭐</div>
+          <div class="result-stats">
+            <div class="result-stat">ACERTOS: <span id="result-correct">0</span></div>
+            <div class="result-stat">ERROS: <span id="result-errors">0</span></div>
+            <div class="result-stat">PONTOS: <span id="result-points">0</span></div>
+            <div class="result-stat">COMBO MAX: <span id="result-combo">0</span>x</div>
+            <div class="result-stat">RANK: <span id="result-rank">—</span></div>
+          </div>
+          <div class="result-badge" id="result-badge"></div>
+          <div class="result-buttons">
+            <button class="pixel-btn" id="btn-retry" onclick="retryPhase()">↺ TENTAR NOVAMENTE</button>
+            <button class="pixel-btn big" id="btn-next-phase" onclick="nextPhase()">▶ PRÓXIMA FASE</button>
+            <button class="pixel-btn" onclick="showMap()">🗺 MAPA</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TELA: RANKING -->
+    <div id="screen-ranking" class="screen">
+      <div class="scanlines"></div>
+      <div class="crt-border">
+        <div class="pixel-header small">
+          <div class="blink-text title-main">🏆 HALL DA FAMA 🏆</div>
+        </div>
+        <div id="ranking-list" class="ranking-list"></div>
+        <button class="pixel-btn" onclick="showScreen('screen-intro')">◀ VOLTAR</button>
+      </div>
+    </div>
+
+    <!-- TELA: CRÉDITOS -->
+    <div id="screen-credits" class="screen">
+      <div class="scanlines"></div>
+      <div class="crt-border">
+        <div class="pixel-header small">
+          <div class="blink-text title-main">ℹ CRÉDITOS</div>
+        </div>
+        <div class="credits-scroll">
+          <div class="credits-content">
+            <p>🎮 PROFESSOR BIT</p>
+            <p>MESTRE DO TECLADO v2.0</p>
+            <br>
+            <p>👨‍💻 DESENVOLVIDO POR:</p>
+            <p>Dayenne Soares</p>
+            <p>Eduarda Ribeiro</p>
+            <p>Lucas Souza</p>
+            <br>
+            <p>🎓 OBJETIVO:</p>
+            <p>ENSINAR AS TECLAS DE<br>NÚMEROS E SÍMBOLOS<br>DE FORMA DIVERTIDA!</p>
+            <br>
+            <p>📚 CONTEÚDO:</p>
+            <p>10+ FASES</p>
+            <p>MODO APRENDER</p>
+            <p>MODO PRATICAR</p>
+            <p>MINI-GAMES</p>
+            <p>RANKING LOCAL</p>
+            <br>
+            <p>© 2026 The Highway</p>
+            <p>TODOS OS DIREITOS</p>
+            <p>RESERVADOS</p>
+          </div>
+        </div>
+        <button class="pixel-btn" onclick="showScreen('screen-intro')">◀ VOLTAR</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/professor.js"></script>
+  <script src="js/phases.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

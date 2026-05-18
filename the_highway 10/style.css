@@ -1,0 +1,150 @@
+:root {
+    --primary-purple: #6a0dad;
+    --light-purple: #a450e6;
+    --dark-purple: #3d0566;
+    --bg-color: #1a1a2e;
+    --text-color: #e0e0e0;
+    --accent-color: #00d4ff;
+    --correct-color: #4caf50;
+    --error-color: #f44336;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    background: rgba(106, 13, 173, 0.1);
+    padding: 2rem;
+    border-radius: 15px;
+    border: 1px solid var(--primary-purple);
+    box-shadow: 0 0 20px rgba(106, 13, 173, 0.3);
+    text-align: center;
+}
+
+header h1 {
+    font-size: 3rem;
+    color: var(--light-purple);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+header p {
+    margin-bottom: 2rem;
+    opacity: 0.8;
+}
+
+#stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 2rem;
+}
+
+.stat-box {
+    background: var(--dark-purple);
+    padding: 1rem;
+    border-radius: 10px;
+    min-width: 120px;
+    font-weight: bold;
+    border: 1px solid var(--primary-purple);
+}
+
+.quote-container {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    text-align: left;
+    min-height: 100px;
+    word-wrap: break-word;
+}
+
+.quote-container span {
+    position: relative;
+}
+
+.correct {
+    color: var(--correct-color);
+}
+
+.incorrect {
+    color: var(--error-color);
+    text-decoration: underline;
+}
+
+.current {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+
+textarea {
+    width: 100%;
+    height: 120px;
+    background: #0f0f1b;
+    border: 2px solid var(--primary-purple);
+    border-radius: 10px;
+    color: white;
+    padding: 1rem;
+    font-size: 1.1rem;
+    resize: none;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+textarea:focus {
+    border-color: var(--accent-color);
+}
+
+.controls {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+button {
+    padding: 0.75rem 2rem;
+    background: var(--primary-purple);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: var(--light-purple);
+}
+
+select {
+    padding: 0.75rem;
+    background: var(--dark-purple);
+    color: white;
+    border: 1px solid var(--primary-purple);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+footer {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    opacity: 0.6;
+}

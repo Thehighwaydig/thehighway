@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Highway</title>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bebas+Neue&family=Barlow:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --purple-dark: #1a0a2e;
+      --purple-mid: #3b1f6e;
+      --purple-accent: #7c3aed;
+      --purple-light: #a855f7;
+      --orange: #f97316;
+      --white: #ffffff;
+      --card-bg: #2d1657;
+      --card-border: #5b21b6;
+      --glow: rgba(168, 85, 247, 0.35);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: var(--purple-dark);
+      background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(124, 58, 237, 0.25) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(249, 115, 22, 0.1) 0%, transparent 50%),
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 60px,
+          rgba(255,255,255,0.015) 60px,
+          rgba(255,255,255,0.015) 61px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 60px,
+          rgba(255,255,255,0.015) 60px,
+          rgba(255,255,255,0.015) 61px
+        );
+      min-height: 100vh;
+      font-family: 'Barlow', sans-serif;
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      text-align: center;
+      padding: 60px 20px 40px;
+      position: relative;
+    }
+
+    header::after {
+      content: '';
+      display: block;
+      width: 60%;
+      max-width: 500px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--purple-accent), var(--orange), transparent);
+      margin: 30px auto 0;
+    }
+
+    .header-title {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 18px;
+      position: relative;
+    }
+
+    .title-the {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      color: var(--white);
+      letter-spacing: 0.08em;
+      text-shadow: 0 0 40px rgba(255,255,255,0.2);
+    }
+
+    .title-highway {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      color: var(--orange);
+      letter-spacing: 0.04em;
+      text-shadow:
+        0 0 20px rgba(249, 115, 22, 0.6),
+        0 0 60px rgba(249, 115, 22, 0.3);
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-top: 8px;
+    }
+
+    /* ── GRID ── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 20px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      aspect-ratio: 1;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      cursor: pointer;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--purple-accent), var(--orange));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-6px) scale(1.03);
+      box-shadow: 0 12px 40px var(--glow), 0 0 0 1px var(--purple-accent);
+      border-color: var(--purple-accent);
+    }
+
+    .card:hover::before { opacity: 1; }
+    .card:hover::after  { transform: scaleX(1); }
+
+    .card-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3rem;
+      line-height: 1;
+      color: var(--purple-light);
+      text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+      transition: color 0.25s, text-shadow 0.25s;
+    }
+
+    .card:hover .card-number {
+      color: var(--orange);
+      text-shadow: 0 0 20px rgba(249, 115, 22, 0.6);
+    }
+
+    .card-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-top: 6px;
+      transition: color 0.25s;
+      text-align: center;
+      padding: 0 8px;
+    }
+
+    .card:hover .card-label { color: rgba(255,255,255,0.7); }
+
+    /* staggered entrance animation */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      animation: fadeUp 0.5s ease both;
+    }
+
+    /* footer */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.18);
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-title">
+      <span class="title-the">The</span>
+      <span class="title-highway">Highway</span>
+    </div>
+    <p class="subtitle">Selecione um destino</p>
+  </header>
+
+  <main>
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <footer>© The Highway — Todos os destinos</footer>
+
+  <script>
+    const destinos = [
+      { num: 1,  label: 'Fileiras',         href: 'Fileiras/index.html' },
+      { num: 2,  label: 'Exercício 5',      href: 'https://agilefingers.com/pt/curso/exercicio-5', target: '_blank' },
+      { num: 3,  label: 'Postura',          href: 'postura/index.html' },
+      { num: 4,  label: 'Fileiras',         href: 'Fileiras/index.html' },
+      { num: 5,  label: 'Fileiras',         href: 'Fileiras/index.html' },
+      { num: 6,  label: 'Game',             href: 'game.bit/index.html' },
+      { num: 7,  label: 'Game',             href: 'game.bit/index.html' },
+      { num: 8,  label: 'Tommy Q',          href: 'https://www.typing.com/br/student/game/tommyq', target: '_blank' },
+      { num: 9,  label: 'Teste de Digitação', href: 'https://www.ratatype.com.br/typing-test/', target: '_blank' },
+      { num: 10, label: 'The Highway 10',   href: 'the_highway 10/index.html' },
+      { num: 11, label: 'Textos',           href: 'https://agilefingers.com/pt/textos', target: '_blank' },
+      { num: 12, label: 'Ditado',           href: 'Ditado/index.html' },
+      { num: 13, label: 'Nitro Type',       href: 'https://www.nitrotype.com/race', target: '_blank' },
+      { num: 14, label: 'Digfacil',         href: 'Digfacil/Dig.html' },
+      { num: 15, label: 'Passo 15',         href: 'passo 15/index.html' },
+      { num: 16, label: 'Textos',           href: 'https://agilefingers.com/pt/textos', target: '_blank' },
+      { num: 17, label: 'Highway Office',   href: 'the_highway_office/index.html' },
+      { num: 18, label: 'Digfacil',         href: 'Digfacil/Dig.html' },
+      { num: 19, label: 'TypeRacer',        href: 'https://play.typeracer.com/?universe=lang_pt', target: '_blank' },
+      { num: 20, label: 'Digfacil',         href: 'Digfacil/Dig.html' },
+    ];
+
+    const grid = document.getElementById('grid');
+
+    destinos.forEach((d, i) => {
+      const a = document.createElement('a');
+      a.className = 'card';
+      a.href = d.href;
+      if (d.target) a.target = d.target;
+      a.style.animationDelay = `${i * 0.05}s`;
+
+      const num = document.createElement('div');
+      num.className = 'card-number';
+      num.textContent = String(d.num).padStart(2, '0');
+
+      const lbl = document.createElement('div');
+      lbl.className = 'card-label';
+      lbl.textContent = d.label;
+
+      a.appendChild(num);
+      a.appendChild(lbl);
+      grid.appendChild(a);
+    });
+  </script>
+
+</body>
+</html>

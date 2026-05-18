@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Highway Office - Simulação de Escritório</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo">
+                <h1>The Highway <span>Office</span></h1>
+            </div>
+            <div class="stats-bar">
+                <div class="stat">Tempo: <span id="timer">02:00</span></div>
+                <div class="stat">Pontos: <span id="score">0</span></div>
+                <div class="stat">WPM: <span id="wpm">0</span></div>
+                <div class="stat">Precisão: <span id="accuracy">100</span>%</div>
+                <div class="stat">Erros: <span id="errors">0</span></div>
+            </div>
+        </header>
+
+        <main>
+            <div class="sidebar">
+                <button class="nav-btn active" data-module="email">📧 E-mails Profissionais</button>
+                <button class="nav-btn" data-module="inventory">📦 Cadastro de Produtos</button>
+                <button class="nav-btn" data-module="support">🎧 Atendimento</button>
+            </div>
+
+            <div class="content-area">
+                <div id="module-title" class="module-header">
+                    <h2>E-mails Profissionais</h2>
+                    <p id="module-desc">Digite o e-mail abaixo para enviar ao cliente.</p>
+                </div>
+
+                <div class="display-box" id="display-text">
+                    <!-- Texto para digitar será inserido aqui -->
+                </div>
+
+                <textarea id="typing-input" placeholder="Comece a digitar a tarefa aqui..." autofocus></textarea>
+                
+                <div class="actions">
+                    <button id="start-btn">Iniciar Expediente</button>
+                    <button id="reset-btn" style="display:none;">Reiniciar</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Modal de Relatório Final -->
+        <div id="report-modal" class="modal">
+            <div class="modal-content">
+                <h2>📊 Relatório de Desempenho</h2>
+                <div class="report-grid">
+                    <div class="report-item"><span>Pontuação Total:</span> <strong id="final-score">0</strong></div>
+                    <div class="report-item"><span>WPM Médio:</span> <strong id="final-wpm">0</strong></div>
+                    <div class="report-item"><span>Precisão Final:</span> <strong id="final-accuracy">0%</strong></div>
+                    <div class="report-item"><span>Total de Erros:</span> <strong id="final-errors">0</strong></div>
+                </div>
+                <button onclick="location.reload()">Novo Expediente</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
